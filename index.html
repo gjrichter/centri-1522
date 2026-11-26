@@ -20,6 +20,20 @@
   #metric-seg { display:flex; border:1px solid #a50f15; border-radius:6px; overflow:hidden; }
   #metric-seg button { flex:1; border:0; background:#fff; color:#a50f15; font-size:12px; padding:5px 8px; cursor:pointer; white-space:nowrap; }
   #metric-seg button.on { background:#a50f15; color:#fff; }
+  #info-btn { padding:6px 10px; border:1px solid #555; border-radius:6px; background:#fff; color:#333; font-size:13px; cursor:pointer; }
+  #info-btn:hover { background:#f2f2f2; }
+  #info-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:3000; align-items:center; justify-content:center; }
+  #info-overlay.open { display:flex; }
+  #info-popup { background:#fff; width:min(720px,94vw); max-height:88vh; border-radius:12px; box-shadow:0 10px 34px rgba(0,0,0,.3); display:flex; flex-direction:column; overflow:hidden; }
+  #info-head { padding:14px 20px; background:#f7f8f9; border-bottom:1px solid #e5e7ea; display:flex; align-items:center; justify-content:space-between; }
+  #info-head h2 { margin:0; font-size:16px; color:#4a0f0f; }
+  #info-close { border:0; background:none; font-size:22px; line-height:1; cursor:pointer; color:#777; padding:2px 6px; }
+  #info-body { padding:6px 22px 16px; overflow-y:auto; font-size:13.5px; line-height:1.55; color:#333; }
+  #info-body h3 { margin:18px 0 5px; font-size:11.5px; text-transform:uppercase; letter-spacing:.07em; color:#0b0d0f; border-bottom:1px solid #e9ebef; padding-bottom:4px; }
+  #info-body p { margin:6px 0; } #info-body ul { margin:6px 0; padding-left:20px; } #info-body li { margin:4px 0; }
+  #info-body .warn { background:#fff4f2; border-left:3px solid #a50f15; padding:8px 12px; border-radius:6px; margin:10px 0; }
+  #info-body table { border-collapse:collapse; font-size:12.5px; margin:6px 0; } #info-body td, #info-body th { padding:2px 10px; border-bottom:1px solid #eee; text-align:right; } #info-body th:first-child, #info-body td:first-child { text-align:left; }
+  #info-foot { padding:10px 20px; background:#f6f7f9; border-top:1px solid #e9ebef; font-size:12px; color:#5b6470; }
   #switches input { position:absolute; opacity:0; pointer-events:none; }
   #switches .sw { width:34px; height:18px; border-radius:9px; background:#bbb; position:relative; transition:background .15s; flex:none; }
   #switches .sw::after { content:""; position:absolute; top:2px; left:2px; width:14px; height:14px; border-radius:50%; background:#fff; transition:left .15s; }
@@ -37,8 +51,44 @@
   <label style="--c:#e8806a"><input type="checkbox" data-key="choro" checked><span class="sw"></span>Coropletica</label>
   <label style="--c:#7b241c"><input type="checkbox" data-key="lolli" checked><span class="sw"></span>Lollipop</label>
   <label style="--c:#1b4f9c"><input type="checkbox" data-key="centri" checked><span class="sw"></span>Centri antiviolenza</label>
+  <button id="info-btn" type="button" title="Descrizione dei dati, delle fonti e dell'elaborazione">ⓘ Informazioni sui dati</button>
   <button id="orbit-btn" type="button" title="Inclina la mappa e ruota la vista in continuo"><span>&#10227;</span><span id="orbit-label">Orbita</span></button>
 </div>
+<div id="info-overlay" role="dialog" aria-modal="true" aria-labelledby="info-title">
+  <div id="info-popup">
+    <div id="info-head"><h2 id="info-title">Informazioni sui dati</h2><button id="info-close" type="button" aria-label="Chiudi">&times;</button></div>
+    <div id="info-body"><h3>Cosa mostra questa mappa</h3>
+<p>Le chiamate al numero antiviolenza e stalking 1522 per provincia di provenienza nei <b>12 mesi da ottobre 2023 a settembre 2024</b> (gli ultimi quattro trimestri disponibili), insieme ai 430 centri antiviolenza. Colore della provincia e lollipop mostrano lo stesso valore, che puoi scegliere con l'interruttore in alto a destra: <b>numero assoluto di chiamate</b> oppure <b>chiamate ogni 100.000 abitanti</b>.</p>
+<h3>Fonti dei dati</h3>
+<ul>
+<li><b>Chiamate al 1522</b> — ISTAT, <i>Il numero di pubblica utilità 1522 – dati provinciali trimestrali, I trimestre 2013 – III trimestre 2024</i> (dati del Dipartimento per le Pari Opportunità, Presidenza del Consiglio). Tavola 1: chiamate da <b>utenti</b> per provincia di provenienza e trimestre, valori assoluti. Sono chiamate telefoniche e via chat, non persone: la stessa persona può chiamare più volte.</li>
+<li><b>Popolazione</b> — ISTAT, popolazione residente per provincia al 1° gennaio 2024 (totale, entrambi i sessi, tutte le età), tramite l'API SDMX.</li>
+<li><b>Centri antiviolenza</b> — elenco ufficiale del 1522 (<a href="https://www.1522.eu/centri-antiviolenza/mappa.html" target="_blank" rel="noopener">1522.eu</a>), 430 centri, mappatura aggiornata al 17/11/2026. Le coordinate vengono dal progetto <a href="https://github.com/piersoft/centri-antiviolenza" target="_blank" rel="noopener">piersoft/centri-antiviolenza</a>, che le ricava dai numeri civici ANNCSU, da OpenStreetMap o dal comune: 266 centri al civico, 66 alla via, 56 con indirizzo OSM, 41 solo al comune, 1 solo alla provincia.</li>
+<li><b>Confini</b> — province ISTAT 2024 (<a href="https://github.com/gjrichter/geo" target="_blank" rel="noopener">gjrichter/geo</a>, versione semplificata). <b>Fondo</b>: ArcGIS Topo (Esri). <b>Motore</b>: ixmaps-gl.</li>
+</ul><h3>Elaborazione</h3>
+<ul>
+<li><b>Somma dei 4 trimestri</b> (IV 2023, I, II e III 2024) per provincia: 43.735 chiamate in tutto. La media «al giorno» nel tooltip divide per 366 giorni.</li>
+<li><b>Tasso</b> = chiamate dei 12 mesi ÷ popolazione al 1.1.2024 × 100.000. A livello nazionale, sulle sole chiamate con provincia, è 74 ogni 100.000 abitanti.</li>
+<li><b>Abbinamento alle province</b>: per nome, con le province ISTAT del 2024. Per la Sardegna, dove i dati usano le province precedenti, Olbia-Tempio è accorpata a Sassari; Carbonia-Iglesias, Ogliastra e Medio Campidano non hanno valori nel periodo. Risultano 107 province.</li>
+<li><b>Centri per provincia</b>: ogni centro è assegnato alla provincia in base al codice ISTAT del suo comune (per la Sardegna con una corrispondenza fatta a mano). Caltanissetta resta senza centri.</li>
+<li><b>Classi di colore</b>: la coropletica usa 5 classi a quantili sul valore scelto. I lollipop usano soglie fisse: 48,9 / 57,1 / 64,8 / 73,4 per il tasso e 150 / 250 / 400 / 800 / 2000 per il numero assoluto.</li>
+<li><b>Dimensione dei lollipop</b>: proporzionale al valore per il tasso, compressa (potenza 3) per i numeri assoluti, altrimenti Roma e Milano coprirebbero il resto.</li>
+<li>Il grafico nel tooltip mostra la serie trimestrale 2013 – III 2024 della provincia (chiamate assolute).</li>
+</ul><h3>Limiti e cautele</h3>
+<div class="warn"><b>Solo una parte delle chiamate ha una provincia.</b> Nelle tavole ISTAT molte chiamate hanno la provincia «non disponibile» e non entrano nella mappa. Negli ultimi 12 mesi (ott 2023 – set 2024) il totale nazionale è di 69.470 chiamate, di cui 43.735 (63%) con provincia. La quota era del 88–93% nel 2013–2016 e del 61–63% nel 2023–2024: i valori provinciali sono quindi una <b>sottostima</b> e le serie nel tempo risentono di questo calo.</div>
+<ul>
+<li>Sono chiamate al 1522, <b>non quelle ricevute dai singoli centri antiviolenza</b>: quel dato non è pubblicato. Il 1522 orienta verso i centri.</li>
+<li>Dal 2023 la serie ISTAT ha una <b>discontinuità</b> (cambio di archiviazione dei dati): confronti con gli anni precedenti da fare con cautela. Nel 2020 (lockdown) e a fine 2023 (dopo il caso Cecchettin) ci sono picchi di chiamate.</li>
+<li>Il tasso usa sempre la popolazione al 1° gennaio 2024, anche per gli anni passati: per i trimestri più vecchi è un'approssimazione.</li>
+<li>Alcune province hanno valori molto alti rispetto alle altre (per esempio Ferrara): non ne ho verificato la causa, che potrebbe essere locale o legata alla registrazione dei dati.</li>
+<li>Una provincia senza centri nella mappa (Caltanissetta) non significa che nel territorio non ci siano servizi: dipende dall'elenco usato.</li>
+</ul>
+<h3>Se hai bisogno di aiuto</h3>
+<p>In caso di pericolo immediato chiama il <b>112</b>. Il <b>1522</b> è gratuito, attivo 24 ore su 24, anche in chat su <a href="https://www.1522.eu/" target="_blank" rel="noopener">1522.eu</a>.</p></div>
+    <div id="info-foot">Mappa non ufficiale. Elaborazione su dati ISTAT, Dipartimento per le Pari Opportunità e 1522.eu.</div>
+  </div>
+</div>
+
 <script>
 // lolli_chart.js (ixmaps-flat usercharts/d3), copia locale: etichetta del valore senza il segno "+"
 /**********************************************************************
@@ -391,6 +441,16 @@ Array.prototype.forEach.call(document.querySelectorAll("#metric-seg button"), fu
     drawMetric(METRIC);
   });
 });
+
+(function () {
+  var ov = document.getElementById("info-overlay");
+  function openInfo() { ov.classList.add("open"); }
+  function closeInfo() { ov.classList.remove("open"); }
+  document.getElementById("info-btn").addEventListener("click", openInfo);
+  document.getElementById("info-close").addEventListener("click", closeInfo);
+  ov.addEventListener("click", function (e) { if (e.target === ov) closeInfo(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeInfo(); });
+})();
 
 var orbitCtl = null, orbitBtn = document.getElementById("orbit-btn");
 function orbitUi(on) { orbitBtn.classList.toggle("on", on); document.getElementById("orbit-label").textContent = on ? "Ferma orbita" : "Orbita"; }
