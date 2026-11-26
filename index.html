@@ -7,6 +7,8 @@
 <style>
   html, body { width:100%; height:100%; margin:0; overflow:hidden; font-family:system-ui,sans-serif; }
   #map { width:100%; height:100%; }
+  .maplibregl-ctrl-bottom-right { max-width: calc(100vw - 330px); }
+  @media (max-width:760px) { .ixmaps-gl-attribution { margin-bottom: 26px; } .maplibregl-ctrl-bottom-right { max-width: none; } }
   #map-title { position:fixed; top:12px; left:276px; right:236px; margin:0 auto; width:fit-content; z-index:1400; text-align:center; pointer-events:none;
                background:rgba(255,255,255,.92); border-radius:8px; box-shadow:0 2px 10px rgba(0,0,0,.2); padding:7px 16px; max-width:calc(100vw - 276px - 236px); box-sizing:border-box; }
   #map-title h1 { margin:0; font-size:17px; line-height:1.25; color:#4a0f0f; }
@@ -351,7 +353,8 @@ var myMap = ixmaps.Map("map", { mapService: "leaflet_vt", mapType: "ArcGIS - Top
   .options({ featurescaling: "true", objectscaling: "dynamic", normalSizeScale: "5000000", dynamicSizePow: "10", flushChartDraw: "1000000", flushPaintShape: "1000000", basemapopacity: "0.5" })
   .require("https://d3js.org/d3.v3.min.js")
   .require("https://cdn.jsdelivr.net/gh/gjrichter/ixmaps-flat@master/usercharts/d3/chart.js")
-  .require("https://cdn.jsdelivr.net/gh/gjrichter/ixmaps-flat@master/usercharts/d3/arrow_chart.js");
+  .require("https://cdn.jsdelivr.net/gh/gjrichter/ixmaps-flat@master/usercharts/d3/arrow_chart.js")
+  .attribution("Dati: <a href=\"https://www.istat.it/tavole-di-dati/il-numero-di-pubblica-utilita-1522-dati-trimestrali-al-iv-trimestre-2023-2/\" target=\"_blank\" rel=\"noopener\">ISTAT</a> \u00b7 <a href=\"https://www.1522.eu/centri-antiviolenza/mappa.html\" target=\"_blank\" rel=\"noopener\">1522.eu</a> \u00b7 <a href=\"https://github.com/piersoft/centri-antiviolenza\" target=\"_blank\" rel=\"noopener\">piersoft</a> \u00b7 <a href=\"https://github.com/gjrichter/ixmaps-gl\" target=\"_blank\" rel=\"noopener\">ixmaps-gl</a>");
 
 var ROWS = PROV.features.map(function (f) { return f.properties; });
 // numeri in formato italiano per i tooltip (stringhe: il motore non le riformatta)
