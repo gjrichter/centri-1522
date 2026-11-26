@@ -354,6 +354,18 @@ var myMap = ixmaps.Map("map", { mapService: "leaflet_vt", mapType: "ArcGIS - Top
   .require("https://cdn.jsdelivr.net/gh/gjrichter/ixmaps-flat@master/usercharts/d3/arrow_chart.js");
 
 var ROWS = PROV.features.map(function (f) { return f.properties; });
+// numeri in formato italiano per i tooltip (stringhe: il motore non le riformatta)
+// il <span> evita che il motore riformatti come numero una stringa che sembra un numero
+var NF = function (v, d) { var s = Number(v).toFixed(d).split("."); s[0] = s[0].replace(/\B(?=(\d{3})+(?!\d))/g, "."); return "<span>" + s.join(",") + "</span>"; };
+ROWS.forEach(function (r) {
+  r.f_chiamate = NF(r.chiamate, 0); r.f_al_giorno = NF(r.al_giorno, 2); r.f_per100k = NF(r.per100k, 1);
+  r.f_centri = NF(r.centri, 0); r.f_centri_100k = NF(r.centri_100k, 2); r.f_popolazione = NF(r.popolazione, 0);
+});
+var TIP_CSS = { tbl: "width:100%;border-collapse:collapse;margin:7px 0 6px;font-size:13px", td: "padding:2px 0;color:#444", tv: "padding:2px 0 2px 14px;text-align:right;font-weight:600;color:#222;white-space:nowrap", sm: "font-weight:400;color:#888;font-size:11.5px" };
+function row(label, value, extra) { return "<tr><td style='" + TIP_CSS.td + "'>" + label + "</td><td style='" + TIP_CSS.tv + "'>" + value + (extra ? " <span style='" + TIP_CSS.sm + "'>" + extra + "</span>" : "") + "</td></tr>"; }
+function head() { return "<div style='min-width:270px'><div style='font-size:15px;font-weight:700;color:#4a0f0f;line-height:1.25'>{{name}} <span style='font-size:12px;font-weight:400;color:#888'>{{regione}}</span></div>"; }
+function tail() { return "<div style='font-size:11.5px;color:#777;border-top:1px solid #eee;padding-top:5px'>Chiamate per trimestre, 2013 \u2013 III 2024</div>{{spark}}</div>"; }
+
 myMap.layer("nuts2")
   .type("FEATURES|SILENT|LOCKED|NOLEGEND")
   .data({ url: "https://gisco-services.ec.europa.eu/distribution/v2/nuts/geojson/NUTS_RG_10M_2021_4326_LEVL_2.geojson", type: "geojson" })
@@ -369,11 +381,11 @@ myMap.layer("province")
   .style({ colorscheme: ["#ffffff"], fillopacity: 0.2, linecolor: "#bbbbbb", linewidth: 0.5, showdata: "true" })
   .define();
 
-var TIP = "<b>{{name}}</b> ({{regione}})<br>" +
-                   "Chiamate al 1522 (ott 2023 – set 2024): {{raw.chiamate}}<br>" +
-                   "≈ {{raw.al_giorno}} al giorno · {{raw.per100k}} ogni 100.000 ab.<br>" +
-                   "Centri antiviolenza: {{raw.centri}} ({{raw.centri_100k}} ogni 100.000 ab.)<br>" +
-                   "<span style='font-size:.85em'>Chiamate per trimestre 2013 – III 2024:</span><br>{{spark}}";
+var TIP = head() + "<table style='" + TIP_CSS.tbl + "'>" +
+  row("Chiamate (ott 2023 \u2013 set 2024)", "{{f_chiamate}}") +
+  row("Media al giorno", "{{f_al_giorno}}") +
+  row("Ogni 100.000 abitanti", "{{f_per100k}}") +
+  row("Centri antiviolenza", "{{f_centri}}", "({{f_centri_100k}} ogni 100.000 ab.)") + "</table>" + tail();
 var DESC_BASE = "I punti sono i 430 centri antiviolenza dell'elenco ufficiale 1522. Il 1522 orienta verso i centri: i dati ISTAT contano le chiamate al numero, non quelle ricevute dai singoli centri (che non sono pubblicate). Chiamate da utenti, esclusi i casi con provincia non disponibile. Colore e lollipop mostrano il tasso ogni 100.000 abitanti o il numero assoluto, a seconda dell'interruttore in alto a destra.<div style='margin-top:.6em;padding-top:.5em;border-top:1px solid #e5e5e5;font-size:.8em;color:#888'>Fonti: ISTAT, Il numero di pubblica utilità 1522 – dati provinciali trimestrali 2013-III 2024 (Dip. Pari Opportunità); popolazione ISTAT 1.1.2024; centri: 1522.eu, mappa di piersoft.</div>";
 var METRIC = "abs";
 var SUBS = { rate: "Ottobre 2023 \u2013 settembre 2024, per provincia \u00b7 colore e lollipop: chiamate ogni 100.000 abitanti \u00b7 punti: 430 centri",
